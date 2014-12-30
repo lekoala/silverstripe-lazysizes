@@ -1,0 +1,25 @@
+.no-js img.lazyload {
+	display: none;
+}
+.lazyload,
+.lazyloading {
+	zoom: 1;
+	filter: alpha(opacity=0);
+	-webkit-opacity: 0;
+	-moz-opacity: 0;
+	opacity: 0;
+}
+.lazyloaded {
+	zoom: 1;
+	filter: alpha(opacity=100);
+	-webkit-opacity: 1;
+	-moz-opacity: 1;
+	opacity: 1;
+	-webkit-transition: opacity 300ms;
+	-moz-transition: opacity 300ms;
+	-o-transition: opacity 300ms;
+	transition: opacity 300ms;
+}
+img {
+    height: auto;
+}

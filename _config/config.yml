@@ -1,0 +1,18 @@
+---
+Name: lasysizes
+---
+Image:
+  extensions:
+    - LasySizesImageExtension
+Controller:
+  extensions:
+    - LasySizesControllerExtension
+LasySizesImageExtension:
+  default_method: SetWidth
+  default_size: 800x600
+  default_set: [320,640,960,1280]
+  lqip_size: 220
+  # pattern could be: noscript, simple, lqip
+  pattern: 'simple'
+  plugins:
+    - 
