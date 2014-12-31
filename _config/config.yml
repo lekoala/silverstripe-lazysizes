@@ -3,16 +3,17 @@ Name: lasysizes
 ---
 Image:
   extensions:
-    - LasySizesImageExtension
+    - LazySizesImageExtension
 Controller:
   extensions:
-    - LasySizesControllerExtension
-LasySizesImageExtension:
+    - LazySizesControllerExtension
+LazySizesImageExtension:
   default_method: SetWidth
   default_size: 800x600
-  default_set: [320,640,960,1280]
   lqip_size: 220
   # pattern could be: noscript, simple, lqip
   pattern: 'simple'
-  plugins:
-    - 
+  js_path: 'lazysizes/javascript'
+  always_load: true
+  sets:
+    default: [320,640,960,1280]

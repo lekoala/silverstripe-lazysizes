@@ -1,19 +1,19 @@
 <?php
 
 /**
- * LasySizesImageExtension
+ * LazySizesImageExtension
  *
  * @author lekoala
  */
-class LasySizesImageExtension extends DataExtension
+class LazySizesImageExtension extends DataExtension
 {
     /**
-     * @var array The list of responsive set methods, in lowercase, to be injected into the Image class
+     * @var array
      */
-    protected $_responsiveSetCache = null;
+    protected static $_responsiveSetsCache = null;
 
     /**
-     * @var Config_ForClass A cached copy of the config object for LasySizesImageExtension
+     * @var Config_ForClass A cached copy of the config object for LazySizesImageExtension
      */
     protected static $_configCache = null;
 
@@ -56,7 +56,7 @@ class LasySizesImageExtension extends DataExtension
      */
     protected function createResponsiveSet($config, $args, $method)
     {
-        Requirements::javascript(LASYSIZES_PATH.'/javascript/lasysizes.min.js');
+        LazySizesControllerExtension::requireLazySizes();
 
         if (!isset($config['sizes']) || !is_array($config['sizes'])) {
             throw new Exception("Responsive set $method does not have sizes defined in its config.");
@@ -68,7 +68,7 @@ class LasySizesImageExtension extends DataExtension
         } elseif (isset($config['default_size'])) {
             $defaultDimensions = $config['default_size'];
         } else {
-            $defaultDimensions = Config::inst()->forClass("LasySizesImageExtension")->default_size;
+            $defaultDimensions = self::config()->default_size;
         }
 
         // Resolve method name
@@ -77,7 +77,7 @@ class LasySizesImageExtension extends DataExtension
         } elseif (isset($config['method'])) {
             $methodName = $config['method'];
         } else {
-            $methodName = Config::inst()->forClass("LasySizesImageExtension")->default_method;
+            $methodName = self::config()->default_method;
         }
 
         // Select which sizes are available
@@ -103,49 +103,43 @@ class LasySizesImageExtension extends DataExtension
                 'Sizes' => $sizes,
                 'DefaultImage' => $this->owner->getFormattedImage($methodName,
                     $default_width, $default_height)
-            ))->renderWith('LasySizesImage');
+            ))->renderWith('LazySizesImage');
     }
 
     /**
-     * Due to {@link Object::allMethodNames()} requiring methods to be expressed
-     * in all lowercase, getting the config for a given method requires iterating
-     * through all the defined sets and making a case-insensitive comparison.
+     * Look for the config in the responsiveSetsCache array
      *
      * @param string $setName The name of the responsive image set to get
      * @return array
      */
     protected function getConfigForSet($setName)
     {
-        if (!$this->_configCache) {
-            $this->_configCache = Config::inst()->forClass("ResponsiveImageExtension")->sets;
-        }
-        if ($this->_configCache) {
-            foreach ($this->_configCache as $k => $v) {
-                if (strtolower($k) == strtolower($setName)) {
-                    return $v;
-                }
-            }
+        $sets = $this->getResponsiveSets();
+        if (isset($sets[strtolower($setName)])) {
+            return $sets[strtolower($setName)];
         }
         return false;
     }
 
     /**
-     * An accessor for $_responsiveSetCache. Stores cache if not set
+     * An accessor for $_responsiveSetsCache. Stores cache if not set
      *
+     * @param boolean $keys
      * @return array
      */
-    protected function getResponsiveSets()
+    protected function getResponsiveSets($keys = false)
     {
-        if (!$this->_responsiveSetCache) {
+        if (!self::$_responsiveSetsCache) {
             $list = array();
-            if ($sets = Config::inst()->forClass("ResponsiveImageExtension")->sets) {
-                foreach ($sets as $setName => $config) {
-                    $list[] = strtolower($setName);
-                }
+            foreach (self::config()->sets as $set => $conf) {
+                $list[strtolower($set)] = $conf;
             }
-            $this->_responsiveSetCache = $list;
+            self::$_responsiveSetsCache = $list;
         }
-        return $this->_responsiveSetCache;
+        if ($keys) {
+            return array_keys(self::$_responsiveSetsCache);
+        }
+        return self::$_responsiveSetsCache;
     }
 
     /**
@@ -153,9 +147,8 @@ class LasySizesImageExtension extends DataExtension
      *
      * @param string $size The string to parse
      * @return array
-     * @todo Should this be a static method?
      */
-    protected function parseDimensions($size)
+    public static function parseDimensions($size)
     {
         $width  = $size;
         $height = null;
@@ -172,7 +165,35 @@ class LasySizesImageExtension extends DataExtension
      */
     public function allMethodNames()
     {
-        $methods = array('createresponsiveset');
-        return array_merge($methods, $this->getResponsiveSets());
+        $methods = array('createresponsiveset', 'srcset');
+        return array_merge($methods, $this->getResponsiveSets(true));
+    }
+
+    /**
+     * Helper method to return a src set
+     *
+     * @param string $sizes
+     * @param boolean $lastOriginal
+     * @return string
+     */
+    public function srcset($sizes, $lastOriginal = true)
+    {
+        $parts  = explode(',', $sizes);
+        $srcset = array();
+
+        $methodName = self::config()->default_method;
+
+        foreach ($parts as $size) {
+            $dim = self::parseDimensions($size);
+
+            if ($lastOriginal == $dim[0]) {
+                $srcset[] = $this->owner->Link().' '.$dim[0].'w';
+            } else {
+                $srcset[] = $this->owner->getFormattedImage($methodName,
+                        $dim[0], $dim[1])->Link().' '.$dim[0].'w';
+            }
+        }
+
+        return implode(',', $srcset);
     }
 }
