@@ -40,7 +40,8 @@ class LazySizesImageExtension extends DataExtension
      */
     public function __call($method, $args)
     {
-        if ($config = $this->getConfigForSet($method)) {
+        $config = $this->getConfigForSet($method);
+        if ($config !== false) {
             return $this->createResponsiveSet($config, $args, $method);
         }
     }
@@ -80,30 +81,32 @@ class LazySizesImageExtension extends DataExtension
             $methodName = self::config()->default_method;
         }
 
-        // Select which sizes are available
-        $sizes = ArrayList::create();
-        foreach ($config['sizes'] as $i => $arr) {
-            if (!isset($arr['query'])) {
-                throw new Exception("Responsive set $method does not have a 'query' element defined for size index $i");
-            }
-            if (!isset($arr['size'])) {
-                throw new Exception("Responsive set $method does not have a 'size' element defined for size index $i");
-            }
-            list($width, $height) = $this->parseDimensions($arr['size']);
-            $sizes->push(ArrayData::create(array(
-                    'Image' => $this->owner->getFormattedImage($methodName,
-                        $width, $height),
-                    'Query' => $arr['query']
-            )));
-        }
+        $srcset = $this->owner->srcset($config['sizes'], false, $methodName);
+
         list($default_width, $default_height) = $this->parseDimensions($defaultDimensions);
 
         // Render template
+        $template = 'LazySizesImage';
+
+        // If we have a srcset, use a template according to pattern
+        if (!empty($srcset)) {
+            $template .= ucfirst(self::config()->pattern);
+        }
+
+        // When using lqip, render a low res image
+        $srclqip = '';
+        if (self::config()->pattern == 'lqip') {
+            $lqip    = self::config()->lqip_multiplier;
+            $srclqip = $this->owner->getFormattedImage($methodName,
+                    $default_width * $lqip, $default_height * $lqip)->Link();
+        }
+
         return $this->owner->customise(array(
-                'Sizes' => $sizes,
+                'ImageSrcSet' => $srcset,
+                'SrcLqip' => $srclqip,
                 'DefaultImage' => $this->owner->getFormattedImage($methodName,
                     $default_width, $default_height)
-            ))->renderWith('LazySizesImage');
+            ))->renderWith($template);
     }
 
     /**
@@ -150,12 +153,23 @@ class LazySizesImageExtension extends DataExtension
      */
     public static function parseDimensions($size)
     {
+        $trigger = null;
+        if ($pos     = strpos($size, ' ') !== false) {
+            $size = explode(' ', $size);
+            $trigger = $size[1];
+            $size    = $size[0];
+        }
         $width  = $size;
         $height = null;
         if (strpos($size, 'x') !== false) {
-            return explode("x", $size);
+            $size = explode("x", $size);
+            $width = $size[0];
+            $height = $size[1];
         }
-        return array($width, $height);
+        if (!$trigger) {
+            $trigger = $width.'w';
+        }
+        return array($width, $height, $trigger);
     }
 
     /**
@@ -174,23 +188,36 @@ class LazySizesImageExtension extends DataExtension
      *
      * @param string $sizes
      * @param boolean $lastOriginal
+     * @param string $methodName
      * @return string
      */
-    public function srcset($sizes, $lastOriginal = true)
+    public function srcset($sizes, $lastOriginal = true, $methodName = null)
     {
-        $parts  = explode(',', $sizes);
+        if (is_array($sizes)) {
+            $parts = $sizes;
+        } else {
+            $parts = explode(',', $sizes);
+        }
+
         $srcset = array();
 
-        $methodName = self::config()->default_method;
+        if ($methodName === null) {
+            $methodName = self::config()->default_method;
+        }
+
+        $lastElement = null;
+        if ($lastOriginal) {
+            $lastElement = end($parts);
+            reset($parts);
+        }
 
         foreach ($parts as $size) {
             $dim = self::parseDimensions($size);
-
-            if ($lastOriginal == $dim[0]) {
-                $srcset[] = $this->owner->Link().' '.$dim[0].'w';
+            if ($lastElement == $dim[0]) {
+                $srcset[] = $this->owner->Link().' '.$dim[2];
             } else {
                 $srcset[] = $this->owner->getFormattedImage($methodName,
-                        $dim[0], $dim[1])->Link().' '.$dim[0].'w';
+                        $dim[0], $dim[1])->Link().' '.$dim[2];
             }
         }
 

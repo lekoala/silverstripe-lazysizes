@@ -1,8 +1,8 @@
 {
-	"name": "lekoala/silverstripe-lasysizes",
-	"description": "Adds lasysizes in the SilverStripe CMS",
+	"name": "lekoala/silverstripe-lazysizes",
+	"description": "Adds lazysizes in the SilverStripe CMS",
 	"type": "silverstripe-module",
-	"keywords": ["silverstripe", "lasysizes", "module", "cms"],
+	"keywords": ["silverstripe", "lazysizes", "module", "cms"],
 	"license": "BSD-3-Clause",
 	"authors": [
 		{
@@ -15,7 +15,7 @@
 				"silverstripe/framework": "~3.1"
 			},
 	"extra": {
-		"installer-name": "lasysizes"
+		"installer-name": "lazysizes"
 	}
 
 }

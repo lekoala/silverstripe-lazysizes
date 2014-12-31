@@ -34,6 +34,44 @@ You can also define your own path to the libraries by adjusting the following pa
 	LazySizesImageExtension:
 		js_path: 'lazysizes/javascript'
 
+LazyLoading
+==================
+
+If you simply want to lazy load your image, you can use any of three default
+methods which specify no additional sizes.
+
+Example:
+
+	$Image.Lazy(720x250)
+	$Image.LazyCrop(720x250)
+	$Image.LazyCropFocus(720x250)
+
+Responsive sets
+==================
+
+You can define your own responsive sets. You can see the bundled configuration
+for the ResponsiveDefault set which set 4 breakpoints.
+You can define your own sets, change sizes, method and default size to be used.
+
+All sets use lazysizes data-sizes="auto" by default, meaning that the width
+of the parent is used to determine which size needs to be loaded.
+
+Retina is also supported.
+
+Config example:
+
+	LazySizesImageExtension:
+		ResponsiveDefault: 
+			sizes: [320x213 320w,640x426 640w,960x639 960w,1280x852 1280w]
+		ResponsiveDefaultSquare: 
+			sizes: [320x320 320w,640x640 640w,960x960 960w,1280x1280 1280w]
+		ResponsiveDefaultRetina:
+			sizes: [400x300 1x, 800x600 2x]
+
+Usage example in template:
+
+	$Image.ResponsiveDefault
+
 Using placeholders
 ==================
 
@@ -58,6 +96,11 @@ Example:
 Compatibility
 ==================
 Tested with 3.1
+
+Installation
+==================
+
+composer require lekoala/silverstripe-lazysizes
 
 Maintainer
 ==================
