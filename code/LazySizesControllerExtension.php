@@ -27,7 +27,7 @@ class LazySizesControllerExtension extends Extension
         }
         $basePath = LazySizesImageExtension::config()->js_path;
 
-        Requirements::customScript(<<<JS
+        /*Requirements::customScript(<<<JS
 function __loadJS(u){var r = document.getElementsByTagName( "script" )[ 0 ], s = document.createElement( "script" );s.src = u;r.parentNode.insertBefore( s, r );}
 
 window.lazySizesConfig = {
@@ -38,7 +38,14 @@ if(!window.HTMLPictureElement){
     __loadJS("$basePath/respimage.min.js");
 }
 JS
+        );*/
+        Requirements::customScript(<<<JS
+window.lazySizesConfig = {
+    addClasses: true
+};
+JS
         );
+        Requirements::javascript($basePath.'/respimage.min.js');
         Requirements::javascript($basePath.'/lazysizes.min.js');
         self::$_alreadyIncluded = true;
     }
