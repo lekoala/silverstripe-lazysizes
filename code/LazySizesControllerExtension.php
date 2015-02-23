@@ -7,7 +7,6 @@
  */
 class LazySizesControllerExtension extends Extension
 {
-
     protected static $_alreadyIncluded = false;
 
     function onAfterInit()
@@ -22,30 +21,17 @@ class LazySizesControllerExtension extends Extension
      */
     static function requireLazySizes()
     {
-        if(self::$_alreadyIncluded) {
+        if (self::$_alreadyIncluded) {
             return false;
         }
         $basePath = LazySizesImageExtension::config()->js_path;
 
-        /*Requirements::customScript(<<<JS
-function __loadJS(u){var r = document.getElementsByTagName( "script" )[ 0 ], s = document.createElement( "script" );s.src = u;r.parentNode.insertBefore( s, r );}
-
-window.lazySizesConfig = {
-    addClasses: true
-};
-
-if(!window.HTMLPictureElement){
-    __loadJS("$basePath/respimage.min.js");
-}
-JS
-        );*/
         Requirements::customScript(<<<JS
 window.lazySizesConfig = {
     addClasses: true
 };
 JS
         );
-        Requirements::javascript($basePath.'/respimage.min.js');
         Requirements::javascript($basePath.'/lazysizes.min.js');
         self::$_alreadyIncluded = true;
     }
@@ -59,19 +45,20 @@ JS
      * @param boolean $lazyload
      * @return string
      */
-    function PlaceholdIt($size = '300x200', $set = null, $lazyload = true) {
+    function PlaceholdIt($size = '300x200', $set = null, $lazyload = true)
+    {
         $html = '<img src="http://placehold.it/'.$size.'"';
-        if($set) {
-            $parts = explode(',', $set);
+        if ($set) {
+            $parts  = explode(',', $set);
             $srcset = array();
-            foreach($parts as $part) {
-                $dim = LazySizesImageExtension::parseDimensions($part);
-                $srcset[] = 'http://placehold.it/' . $part . ' ' . $dim[0] .'w';
+            foreach ($parts as $part) {
+                $dim      = LazySizesImageExtension::parseDimensions($part);
+                $srcset[] = 'http://placehold.it/'.$part.' '.$dim[0].'w';
             }
 
             $html .= ' data-srcset="'.implode(',', $srcset).'"';
         }
-        if($lazyload) {
+        if ($lazyload) {
             $html .= ' class="lazyload"';
         }
         $html .= '/>';
