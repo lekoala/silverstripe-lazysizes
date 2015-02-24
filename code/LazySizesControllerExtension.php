@@ -47,7 +47,7 @@ JS
      */
     function PlaceholdIt($size = '300x200', $set = null, $lazyload = true)
     {
-        $html = '<img src="http://placehold.it/'.$size.'"';
+        $html = '<img data-sizes="auto" src="http://placehold.it/'.$size.'"';
         if ($set) {
             $parts  = explode(',', $set);
             $srcset = array();
