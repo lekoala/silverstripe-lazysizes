@@ -9,8 +9,30 @@ class LazySizesControllerExtension extends Extension
 {
     protected static $_alreadyIncluded = false;
 
+    /**
+     * Helper to detect if we are in admin or development admin
+     *
+     * @return boolean
+     */
+    public function isAdminBackend()
+    {
+        if (
+            $this->owner instanceof LeftAndMain ||
+            $this->owner instanceof DevelopmentAdmin ||
+            $this->owner instanceof DatabaseAdmin ||
+            (class_exists('DevBuildController') && $this->owner instanceof DevBuildController)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
     function onAfterInit()
     {
+        if ($this->isAdminBackend()) {
+            return;
+        }
         if (LazySizesImageExtension::config()->always_load) {
             self::requireLazySizes();
         }
