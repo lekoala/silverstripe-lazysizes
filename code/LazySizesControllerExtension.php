@@ -28,7 +28,7 @@ class LazySizesControllerExtension extends Extension
         return false;
     }
 
-    function onAfterInit()
+    public function onAfterInit()
     {
         if ($this->isAdminBackend()) {
             return;
@@ -41,7 +41,7 @@ class LazySizesControllerExtension extends Extension
     /**
      * Helper method to include lazysizes. Prevent multiple inclusions.
      */
-    static function requireLazySizes()
+    public static function requireLazySizes()
     {
         if (self::$_alreadyIncluded) {
             return false;
@@ -67,7 +67,7 @@ JS
      * @param boolean $lazyload
      * @return string
      */
-    function PlaceholdIt($size = '300x200', $set = null, $lazyload = true)
+    public function PlaceholdIt($size = '300x200', $set = null, $lazyload = true)
     {
         $html = '<img data-sizes="auto" src="http://placehold.it/'.$size.'"';
         if ($set) {
