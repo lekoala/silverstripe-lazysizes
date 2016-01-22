@@ -8,7 +8,7 @@
         "module",
         "cms"
     ],
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "authors": [
         {
             "name": "LeKoala",
