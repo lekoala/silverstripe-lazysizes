@@ -19,7 +19,7 @@ class LazySizesImageExtension extends DataExtension
 
     /**
      * Config accessor
-     * 
+     *
      * @return Config_ForClass
      */
     public static function config()
