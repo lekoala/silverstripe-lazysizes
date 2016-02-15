@@ -61,9 +61,9 @@ Retina is also supported.
 Config example:
 
 	LazySizesImageExtension:
-		ResponsiveDefault: 
+		ResponsiveDefault:
 			sizes: [320x213 320w,640x426 640w,960x639 960w,1280x852 1280w]
-		ResponsiveDefaultSquare: 
+		ResponsiveDefaultSquare:
 			sizes: [320x320 320w,640x640 640w,960x960 960w,1280x1280 1280w]
 		ResponsiveDefaultRetina:
 			sizes: [400x300 1x, 800x600 2x]
