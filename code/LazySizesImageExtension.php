@@ -25,7 +25,7 @@ class LazySizesImageExtension extends DataExtension
     public static function config()
     {
         if (!self::$_configCache) {
-            self::$_configCache = Config::inst()->forClass(__CLASS__);
+            self::$_configCache = Config::inst()->forClass(__class__);
         }
         return self::$_configCache;
     }
@@ -96,17 +96,44 @@ class LazySizesImageExtension extends DataExtension
         // When using lqip, render a low res image
         $srclqip = '';
         if (self::config()->pattern == 'lqip') {
-            $lqip    = self::config()->lqip_multiplier;
-            $srclqip = $this->owner->getFormattedImage($methodName,
-                    $default_width * $lqip, $default_height * $lqip)->Link();
+            $lqip = self::config()->lqip_multiplier;
+            if ($methodName == 'CroppedFocusedImage') {
+                $srclqip = $this->owner->getFormattedImage(
+                    $methodName,
+                    $default_width * $lqip,
+                    $default_height * $lqip,
+                    0,
+                    0
+                )->Link();
+            } else {
+                $srclqip = $this->owner->getFormattedImage(
+                    $methodName,
+                    $default_width * $lqip,
+                    $default_height * $lqip
+                )->Link();
+            }
         }
 
+        if ($methodName == 'CroppedFocusedImage') {
+            $defaultImage = $this->owner->getFormattedImage(
+                $methodName,
+                $default_width,
+                $default_height,
+                0,
+                0
+            );
+        } else {
+            $defaultImage = $this->owner->getFormattedImage(
+                $methodName,
+                $default_width,
+                $default_height
+            );
+        }
         return $this->owner->customise(array(
-                'ImageSrcSet' => $srcset,
-                'SrcLqip' => $srclqip,
-                'DefaultImage' => $this->owner->getFormattedImage($methodName,
-                    $default_width, $default_height)
-            ))->renderWith($template);
+            'ImageSrcSet' => $srcset,
+            'SrcLqip' => $srclqip,
+            'DefaultImage' => $defaultImage,
+        ))->renderWith($template);
     }
 
     /**
@@ -154,12 +181,12 @@ class LazySizesImageExtension extends DataExtension
     public static function parseDimensions($size)
     {
         $trigger = null;
-        if ($pos     = strpos($size, ' ') !== false) {
+        if ($pos = strpos($size, ' ') !== false) {
             $size = explode(' ', $size);
             $trigger = $size[1];
-            $size    = $size[0];
+            $size = $size[0];
         }
-        $width  = $size;
+        $width = $size;
         $height = null;
         if (strpos($size, 'x') !== false) {
             $size = explode("x", $size);
@@ -167,7 +194,7 @@ class LazySizesImageExtension extends DataExtension
             $height = $size[1];
         }
         if (!$trigger) {
-            $trigger = $width.'w';
+            $trigger = $width . 'w';
         }
         return array($width, $height, $trigger);
     }
@@ -214,10 +241,14 @@ class LazySizesImageExtension extends DataExtension
         foreach ($parts as $size) {
             $dim = self::parseDimensions($size);
             if ($lastElement == $dim[0]) {
-                $srcset[] = $this->owner->Link().' '.$dim[2];
+                $srcset[] = $this->owner->Link() . ' ' . $dim[2];
             } else {
-                $srcset[] = $this->owner->getFormattedImage($methodName,
-                        $dim[0], $dim[1])->Link().' '.$dim[2];
+                if ($methodName == 'CroppedFocusedImage') {
+                    $formattedImage = $this->owner->getFormattedImage($methodName, $dim[0], $dim[1], 0, 0);
+                } else {
+                    $formattedImage = $this->owner->getFormattedImage($methodName, $dim[0], $dim[1]);
+                }
+                $srcset[] = $formattedImage->Link() . ' ' . $dim[2];
             }
         }
 

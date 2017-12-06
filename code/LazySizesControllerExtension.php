@@ -16,12 +16,9 @@ class LazySizesControllerExtension extends Extension
      */
     public function isAdminBackend()
     {
-        if (
-            $this->owner instanceof LeftAndMain ||
+        if ($this->owner instanceof LeftAndMain ||
             $this->owner instanceof DevelopmentAdmin ||
-            $this->owner instanceof DatabaseAdmin ||
-            (class_exists('DevBuildController') && $this->owner instanceof DevBuildController)
-        ) {
+            $this->owner instanceof DatabaseAdmin || (class_exists('DevBuildController') && $this->owner instanceof DevBuildController)) {
             return true;
         }
 
@@ -52,9 +49,8 @@ class LazySizesControllerExtension extends Extension
 window.lazySizesConfig = {
     addClasses: true
 };
-JS
-        );
-        Requirements::javascript($basePath.'/lazysizes.min.js');
+JS);
+        Requirements::javascript($basePath . '/lazysizes.min.js');
         self::$_alreadyIncluded = true;
     }
 
@@ -69,16 +65,16 @@ JS
      */
     public function PlaceholdIt($size = '300x200', $set = null, $lazyload = true)
     {
-        $html = '<img data-sizes="auto" src="http://placehold.it/'.$size.'"';
+        $html = '<img data-sizes="auto" src="http://placehold.it/' . $size . '"';
         if ($set) {
-            $parts  = explode(',', $set);
+            $parts = explode(',', $set);
             $srcset = array();
             foreach ($parts as $part) {
-                $dim      = LazySizesImageExtension::parseDimensions($part);
-                $srcset[] = 'http://placehold.it/'.$part.' '.$dim[0].'w';
+                $dim = LazySizesImageExtension::parseDimensions($part);
+                $srcset[] = 'http://placehold.it/' . $part . ' ' . $dim[0] . 'w';
             }
 
-            $html .= ' data-srcset="'.implode(',', $srcset).'"';
+            $html .= ' data-srcset="' . implode(',', $srcset) . '"';
         }
         if ($lazyload) {
             $html .= ' class="lazyload"';
