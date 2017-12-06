@@ -45,11 +45,12 @@ class LazySizesControllerExtension extends Extension
         }
         $basePath = LazySizesImageExtension::config()->js_path;
 
-        Requirements::customScript(<<<JS
-window.lazySizesConfig = {
-    addClasses: true
-};
-JS);
+        $script = <<<JS
+        window.lazySizesConfig = {
+            addClasses: true
+        };
+JS;
+        Requirements::customScript($script);
         Requirements::javascript($basePath . '/lazysizes.min.js');
         self::$_alreadyIncluded = true;
     }
