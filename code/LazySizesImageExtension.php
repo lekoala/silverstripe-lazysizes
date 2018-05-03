@@ -97,38 +97,18 @@ class LazySizesImageExtension extends DataExtension
         $srclqip = '';
         if (self::config()->pattern == 'lqip') {
             $lqip = self::config()->lqip_multiplier;
-            if ($methodName == 'CroppedFocusedImage') {
-                $srclqip = $this->owner->getFormattedImage(
-                    $methodName,
-                    $default_width * $lqip,
-                    $default_height * $lqip,
-                    0,
-                    0
-                )->Link();
-            } else {
-                $srclqip = $this->owner->getFormattedImage(
-                    $methodName,
-                    $default_width * $lqip,
-                    $default_height * $lqip
-                )->Link();
-            }
+            $srclqip = $this->owner->getFormattedImage(
+                $methodName,
+                $default_width * $lqip,
+                $default_height * $lqip
+            )->Link();
         }
 
-        if ($methodName == 'CroppedFocusedImage') {
-            $defaultImage = $this->owner->getFormattedImage(
-                $methodName,
-                $default_width,
-                $default_height,
-                0,
-                0
-            );
-        } else {
-            $defaultImage = $this->owner->getFormattedImage(
-                $methodName,
-                $default_width,
-                $default_height
-            );
-        }
+        $defaultImage = $this->owner->getFormattedImage(
+            $methodName,
+            $default_width,
+            $default_height
+        );
         return $this->owner->customise(array(
             'ImageSrcSet' => $srcset,
             'SrcLqip' => $srclqip,
