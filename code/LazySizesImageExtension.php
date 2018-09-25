@@ -104,11 +104,37 @@ class LazySizesImageExtension extends DataExtension
             )->Link();
         }
 
-        $defaultImage = $this->owner->getFormattedImage(
-            $methodName,
-            $default_width,
-            $default_height
-        );
+        $width = $this->owner->getWidth();
+        $height = $this->owner->getHeight();
+
+        if ($methodName == 'CroppedFocusedImage') {
+            $axis = 0;
+
+            // Use best axis
+            if ($width < $default_width || $height < $default_height) {
+                $diff_w = $default_width - $width;
+                $diff_h = $default_height - $height;
+                if ($diff_w < $diff_h) {
+                    $axis = 'x';
+                } else {
+                    $axis = 'y';
+                }
+            }
+
+            $defaultImage = $this->owner->getFormattedImage(
+                $methodName,
+                $default_width,
+                $default_height,
+                $axis
+            );
+        } else {
+            $defaultImage = $this->owner->getFormattedImage(
+                $methodName,
+                $default_width,
+                $default_height
+            );
+        }
+
         return $this->owner->customise(array(
             'ImageSrcSet' => $srcset,
             'SrcLqip' => $srclqip,
