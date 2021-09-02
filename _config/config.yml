@@ -12,20 +12,20 @@ LazySizesImageExtension:
   default_size: 800x600
   lqip_multiplier: 0.2
   # pattern could be: noscript, simple, lqip
-  pattern: 'simple'
-  js_path: 'lazysizes/javascript'
+  pattern: "simple"
+  js_path: "lazysizes/javascript"
   always_load: true
   sets:
     Lazy:
-        method: SetWidth
-        sizes: []
+      method: SetWidth
+      sizes: []
     LazyCrop:
-        method: CroppedImage
-        sizes: []
+      method: CroppedImage
+      sizes: []
     LazyCropFocus:
-        method: CroppedFocusedImage
-        sizes: []
+      method: CroppedFocusedImage
+      sizes: []
     ResponsiveDefault:
-        sizes: [320x213 320w,640x426 640w,960x639 960w,1280x852 1280w]
+      sizes: [320x213 320w, 640x426 640w, 960x639 960w, 1280x852 1280w]
     ResponsiveDefaultSquare:
-        sizes: [320x320 320w,640x640 640w,960x960 960w,1280x1280 1280w]
+      sizes: [320x320 320w, 640x640 640w, 960x960 960w, 1280x1280 1280w]
